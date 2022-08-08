@@ -115,6 +115,13 @@ jobs:
                 --template-file .circleci/files/backend.yml \
                 --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
                 --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
+        - run:
+            name: Deploy frontend infrastructure
+            command: |
+              aws cloudformation deploy \
+                --template-file .circleci/files/backend.yml \
+                --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+                --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
 workflows:
   default:
     jobs:
@@ -136,19 +143,5 @@ workflows:
           filters:
             branches:
               only: [main]
-      - slack/on-hold:
-          context: slack-secrets
-          filters:
-            tags:
-              only: /^v.*/
-          requires:
-            - test-backend
-      - pause_workflow:
-          filters:
-            tags:
-              only: /^v.*/
-          requires:
-            - test-backend
-            - slack/on-hold
-          type: approval
+        
 
