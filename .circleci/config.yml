@@ -122,6 +122,67 @@ jobs:
                 --template-file .circleci/files/backend.yml \
                 --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
                 --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
+  configure-infrastructure:
+    docker: 
+      - image: python:3.9.0-alpine
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["41:48:a4:1d:d9:9e:24:e1:7a:7a:0e:72:ad:34:cd:5a"]
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install dependencies
+          working_directory: ./.circleci/ansible
+          command: |
+            apk add --update ansible
+            ansible --version
+      - run:
+          name: Configure server
+          command: |
+            cd .circleci/ansible
+            pwd
+            cat inventory.txt
+            export ANSIBLE_HOST_KEY_CHECKING=false
+            ansible-playbook -i inventory.txt configure-server.yml
+      - destroy-environment:
+          workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
+  run-migrations:
+    docker:
+      # Docker image that supports NodeJS
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build-cache]
+      - attach_workspace:
+          at: .
+      - create-dotenv-file
+      - run:
+          name: install node
+          command: |
+            cd ./backend
+            npm install
+      - run:
+          name: Run database migration
+          command: |
+            cd ./backend
+            pwd
+            npm run migrations > migrations_log.txt
+            cat ./migrations_log.txt
+    #  - run:
+    #      name: Send database migration status to memstash
+    #      command: |
+    #        if grep "has been executed successfully" ./backend/migrations_log.txt;
+    #        then
+    #          echo "Database migration has been executed successfully"
+    #          curl -H "Content-Type: text/plain" -H "token: 7079126b-54c1-4ae1-b7cf-577d8a27c76f" --request PUT --data "success" https://api.memstash.io/values/DB_MIGRATION_STATUS_${CIRCLE_WORKFLOW_ID:0:7}
+    #        else
+    #          echo "Database migration has failed, verify DB setup!"
+    #          curl -H "Content-Type: text/plain" -H "token: 7079126b-54c1-4ae1-b7cf-577d8a27c76f" --request PUT --data "failure" https://api.memstash.io/values/DB_MIGRATION_STATUS_${CIRCLE_WORKFLOW_ID:0:7}
+    #        fi
+      #- destroy-environment:
+      #    workflowID: ${CIRCLE_WORKFLOW_ID:0:7}              
 workflows:
   default:
     jobs:
@@ -143,5 +204,8 @@ workflows:
           filters:
             branches:
               only: [main]
-        
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]  
 
