@@ -115,13 +115,13 @@ jobs:
                 --template-file .circleci/files/backend.yml \
                 --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
                 --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
-        - run:
-            name: Deploy frontend infrastructure
-            command: |
-              aws cloudformation deploy \
-                --template-file .circleci/files/backend.yml \
-                --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-                --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
+        #- run:
+         #   name: Deploy frontend infrastructure
+          #  command: |
+           #   aws cloudformation deploy \
+            #    --template-file .circleci/files/backend.yml \
+             #   --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              #  --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
   configure-infrastructure:
     docker: 
       - image: python:3.9.0-alpine
@@ -145,8 +145,8 @@ jobs:
             cat inventory.txt
             export ANSIBLE_HOST_KEY_CHECKING=false
             ansible-playbook -i inventory.txt configure-server.yml
-      - destroy-environment:
-          workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
+    #  - destroy-environment:
+     #     workflowID: ${CIRCLE_WORKFLOW_ID:0:7}
   run-migrations:
     docker:
       # Docker image that supports NodeJS
@@ -157,7 +157,7 @@ jobs:
           keys: [backend-build-cache]
       - attach_workspace:
           at: .
-      - create-dotenv-file
+      #- create-dotenv-file
       - run:
           name: install node
           command: |
@@ -186,24 +186,24 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
-      - test-frontend:
-         requires: [build-frontend]
-      - test-backend:
-         filters:
-            tags:
-              only: /^v.*/
-         requires: [build-backend]
-      - scan-frontend:
-          requires: [build-frontend]
-      - scan-backend:
-          requires: [build-backend]
-      - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-          filters:
-            branches:
-              only: [main]
+      #- build-frontend
+      #- build-backend
+      #- test-frontend:
+         #requires: [build-frontend]
+      #- test-backend:
+      #   filters:
+      #      tags:
+      #        only: /^v.*/
+         #requires: [build-backend]
+      #- scan-frontend:
+          #requires: [build-frontend]
+      #- scan-backend:
+          #requires: [build-backend]
+      - deploy-infrastructure
+      #    requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      #    filters:
+      #      branches:
+      #        only: [main]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
