@@ -70,14 +70,14 @@ scan-frontend:
       - restore_cache:
         keys: [fonntend-scan]
       - run:
-        name: scan-frontend
-        command: |
-          cd frontend
-        #  npm install
-          npm install oauth-sing@^0.9.0
-          npm audit fix --audit-level=critical
-          npm audit fix --force
-          npm audit --audit-level-critial
+          name: scan-frontend
+          command: |
+            cd frontend
+          # npm install
+            npm install oauth-sing@^0.9.0
+            npm audit fix --audit-level=critical
+            npm audit fix --force
+            npm audit --audit-level-critial
 
 workflows:
   default:
