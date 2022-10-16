@@ -54,7 +54,7 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - restore:_cache:
+      - restore_cache:
           keys: [backend-test]
       - run:
           name: test back-end
