@@ -156,22 +156,22 @@ jobs:
             - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure  
     
-    configure-infrastructure:
-      docker:
-        - image: cimg/base:stable
-      stes:
-        - checkout
-        - install_ansible
-        - add_ssh_keys:
-            fingerprints: ["74:f8:0c:03:87:70:65:7d:1e:70:7b:f9:1b:4d:33:11:5d:04:50:9c"]
-        - attach_workspace:
-            at: ~/
-        - run:
-            name: Configure server
-            command: |
-              cd .circleci/ansible
-              cat inventory.txt
-              ansible-playbook -i inventory.txt configure-server.yml
+  configure-infrastructure:
+    docker:
+      - image: cimg/base:stable
+    stes:
+      - checkout
+      - install_ansible
+      - add_ssh_keys:
+          fingerprints: ["74:f8:0c:03:87:70:65:7d:1e:70:7b:f9:1b:4d:33:11:5d:04:50:9c"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Configure server
+          command: |
+            cd .circleci/ansible
+            cat inventory.txt
+            ansible-playbook -i inventory.txt configure-server.yml
 
 workflows:
   default:
