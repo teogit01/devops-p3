@@ -10,7 +10,16 @@ commands:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
-
+  install_ansible:
+    description: Install Ansible
+    steps:
+      - run:
+          name: Install Ansible
+          command: |
+            sudo apt update
+            sudo apt install software-properties-common -y
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible -y
 orbs:
   slack: circleci/slack@4.10.1
 jobs:
@@ -146,6 +155,23 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure  
+    
+    configure-infrastructure:
+      docker:
+        - image: cimg/base:stable
+      stes:
+        - checkout
+        - install_ansible
+        - add_ssh_keys:
+            fingerprints: ["74:f8:0c:03:87:70:65:7d:1e:70:7b:f9:1b:4d:33:11:5d:04:50:9c"]
+        - attach_workspace:
+            at: ~/
+        - run:
+            name: Configure server
+            command: |
+              cd .circleci/ansible
+              cat inventory.txt
+              ansible-playbook -i inventory.txt configure-server.yml
 
 workflows:
   default:
@@ -162,4 +188,5 @@ workflows:
           requires: [build-backend]
       - deploy-infrastructure:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-        
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
