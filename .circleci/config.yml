@@ -187,7 +187,7 @@ jobs:
           paths:
             - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure  
-      #- destroy-environment
+      - destroy-environment
     
   configure-infrastructure:
     docker:
@@ -196,7 +196,7 @@ jobs:
       - checkout
       - install_ansible
       - add_ssh_keys:
-          fingerprints: ["74:f8:0c:03:87:70:65:7d:1e:70:7b:f9:1b:4d:33:11:5d:04:50:9c"]
+          fingerprints: ["14:f0:23:f5:1e:13:58:55:76:bc:7e:f8:30:26:db:2c:4d:35:d1:82"]
       - attach_workspace:
           at: ~/
       - run:
@@ -255,7 +255,7 @@ jobs:
             cd frontend
             npm run build
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      #- destroy-environment
+      - destroy-environment
   deploy-backend:
     docker:
       - image: cimg/base:stable
@@ -265,7 +265,7 @@ jobs:
       - install_ansible
       - install_nodejs
       - add_ssh_keys:
-          fingerprints: ["74:f8:0c:03:87:70:65:7d:1e:70:7b:f9:1b:4d:33:11:5d:04:50:9c"]
+          fingerprints: ["14:f0:23:f5:1e:13:58:55:76:bc:7e:f8:30:26:db:2c:4d:35:d1:82"]
       - attach_workspace:
           at: ~/
       - restore_cache:
@@ -294,7 +294,7 @@ jobs:
             cat inventory.txt
             export ANSIBLE_HOST_KEY_CHECKING=False
             ansible-playbook -i inventory.txt deploy-backend.yml
-      #- destroy-environment
+      - destroy-environment
 
 workflows:
   default:
