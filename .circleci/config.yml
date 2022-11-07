@@ -378,6 +378,7 @@ jobs:
             curl https://kvdb.io/RxkY4cNyqaupx4XR2iy7U2/old_workflow_id -d "${OLD_WORKFLOW_ID}"
       - destroy-environment
       - revert-migrations
+  
   cleanup:
     docker:
       - image: cimg/base:stable
