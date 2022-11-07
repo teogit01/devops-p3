@@ -61,6 +61,14 @@ commands:
               npm install
               npm run migration:revert
             fi
+  
+  notify_on_failure:
+    steps:
+      - slack/notify:
+          event: fail
+          channel: notification_failed_cicd
+          template: basic_fail_1
+
 orbs:
   slack: circleci/slack@4.10.1
 jobs:
@@ -145,10 +153,9 @@ jobs:
           command: |
             cd frontend
             npm install
-            npm install oauth-sign@^0.9.0
-            npm audit fix --audit-level=critical
-            npm audit fix --force
+            npm audit fix --force --audit-level=critical
             npm audit --audit-level=critical
+      - notify_on_failure
   
   scan-backend:
     docker:
@@ -162,10 +169,8 @@ jobs:
           command: |
             cd backend
             npm install
-            npm install oauth-sign@^0.9.0
-            npm audit fix --audit-level=critical
             npm audit fix --force
-            npm audit --audit-level=critical
+      - notify_on_failure
 
   deploy-infrastructure:
     docker:
